@@ -1,0 +1,39 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// RBXPass data models
+
+model Order {
+  id           Int      @id @default(autoincrement())
+  short_code   String   @unique
+  code         String
+  nickname     String
+  user_id      String
+  gamepass_id  String
+  gamepass_url String
+  status       String   // queued | processing | done | error
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  @@index([code])
+  @@index([short_code])
+  @@index([status])
+}
+
+model Code {
+  id       Int       @id @default(autoincrement())
+  code     String    @unique
+  nominal  Int
+  status   String    // active | used
+  used_at  DateTime?
+}

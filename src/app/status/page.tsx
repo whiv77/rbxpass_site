@@ -1,0 +1,214 @@
+"use client";
+import { useState } from "react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, Search, CheckCircle, Clock, XCircle, AlertCircle } from "lucide-react";
+import { Navigation } from "@/components/navigation";
+
+const statusConfig = {
+  queued: {
+    label: "В очереди",
+    color: "bg-yellow-100 text-yellow-800",
+    icon: Clock,
+    description: "Ваш заказ добавлен в очередь на обработку"
+  },
+  processing: {
+    label: "В обработке",
+    color: "bg-blue-100 text-blue-800",
+    icon: Loader2,
+    description: "Заказ обрабатывается, пожалуйста, подождите"
+  },
+  done: {
+    label: "Выполнен",
+    color: "bg-green-100 text-green-800",
+    icon: CheckCircle,
+    description: "Заказ успешно выполнен! Robux должны быть на вашем аккаунте"
+  },
+  error: {
+    label: "Ошибка",
+    color: "bg-red-100 text-red-800",
+    icon: XCircle,
+    description: "Произошла ошибка при обработке заказа"
+  }
+};
+
+export default function StatusPage() {
+  const [code, setCode] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function check() {
+    setLoading(true);
+    setError(null);
+    setStatus(null);
+    const res = await fetch(`/api/status?code=${encodeURIComponent(code)}`);
+    const data = await res.json();
+    setLoading(false);
+    if (!data.ok) return setError(data.error ?? "Заказ не найден");
+    setStatus(data.order.status);
+  }
+
+  const statusInfo = status ? statusConfig[status as keyof typeof statusConfig] : null;
+  const StatusIcon = statusInfo?.icon || AlertCircle;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <Navigation currentPage="status" />
+
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+              📊 Статус заказа
+            </h1>
+            <p className="text-xl text-gray-600">
+              Проверьте статус вашего заказа
+            </p>
+          </div>
+
+          {/* Main Card */}
+          <Card className="shadow-xl">
+            <CardHeader>
+              <CardTitle className="text-2xl text-center">Проверка статуса</CardTitle>
+              <CardDescription className="text-center">
+                Введите короткий код из подтверждения активации
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="status-code">Код заказа</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="status-code"
+                    value={code}
+                    onChange={(e) => setCode(e.target.value.toUpperCase())}
+                    placeholder="ABC123"
+                    className="font-mono"
+                  />
+                  <Button 
+                    onClick={check} 
+                    disabled={loading || !code.trim()}
+                    className="px-6"
+                  >
+                    {loading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <>
+                        <Search className="w-4 h-4 mr-2" />
+                        Проверить
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Status Display */}
+              {status && statusInfo && (
+                <Alert>
+                  <StatusIcon className="h-4 w-4" />
+                  <AlertDescription>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">Текущий статус:</span>
+                        <Badge className={statusInfo.color}>
+                          {statusInfo.label}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-gray-600">
+                        {statusInfo.description}
+                      </p>
+                    </div>
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Error Message */}
+              {error && (
+                <Alert variant="destructive">
+                  <XCircle className="h-4 w-4" />
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+
+              {/* Help Text */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h3 className="font-medium text-blue-900 mb-2">💡 Где найти код заказа?</h3>
+                <p className="text-sm text-blue-800">
+                  Короткий код заказа (например, ABC123) вы получили после успешной активации. 
+                  Он отображается в сообщении подтверждения.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Status Legend */}
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <Clock className="w-4 h-4 text-yellow-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">В очереди</h3>
+                    <p className="text-sm text-gray-600">Заказ ожидает обработки</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Loader2 className="w-4 h-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">В обработке</h3>
+                    <p className="text-sm text-gray-600">Заказ выполняется</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Выполнен</h3>
+                    <p className="text-sm text-gray-600">Robux доставлены</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                    <XCircle className="w-4 h-4 text-red-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-medium">Ошибка</h3>
+                    <p className="text-sm text-gray-600">Требуется помощь</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
