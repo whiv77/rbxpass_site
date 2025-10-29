@@ -3,15 +3,12 @@ import { cookies } from "next/headers";
 import { verifyAdminToken } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { 
   Package, 
   Key, 
   Upload, 
   LogOut, 
-  Settings,
-  BarChart3,
-  Users
+  Settings
 } from "lucide-react";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
