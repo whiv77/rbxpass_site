@@ -1,11 +1,11 @@
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "dev-secret";
+const JWT_SECRET = process.env.JWT_SECRET
 
 export function verifyAdminToken(token: string | null): { ok: boolean; payload?: { role: string } } {
   if (!token) return { ok: false };
   try {
-    const payload = jwt.verify(token.replace(/^Bearer\s+/i, ""), JWT_SECRET) as { role?: string };
+    const payload = jwt.verify(token.replace(/^Bearer\s+/i, ""), JWT_SECRET!) as { role?: string };
     if (typeof payload === "object" && payload && payload.role === "admin") {
       return { ok: true, payload: { role: payload.role } };
     }

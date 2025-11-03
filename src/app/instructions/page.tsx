@@ -110,7 +110,7 @@ export default function InstructionsPage() {
 
           {/* Steps */}
           <div className="space-y-6">
-            {steps.map((step, index) => {
+            {steps.map((step) => {
               const Icon = step.icon;
               return (
                 <Card key={step.number} className="shadow-lg">

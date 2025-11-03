@@ -12,7 +12,6 @@ import {
   CheckCircle, 
   AlertTriangle, 
   Loader2,
-  Download,
   FileSpreadsheet
 } from "lucide-react";
 

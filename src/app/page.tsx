@@ -10,10 +10,8 @@ import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
 import { 
   CheckCircle, 
-  CreditCard, 
   Loader2,
   Copy,
-  Gamepad2,
   Sparkles
 } from "lucide-react";
 import { Navigation } from "@/components/navigation";
@@ -69,7 +67,7 @@ export default function CodeActivationPage() {
       setActivationResult(data);
       setStep(2);
       
-    } catch (err) {
+    } catch {
       setLoading(false);
       setError("Ошибка соединения с сервером");
     }
@@ -101,7 +99,7 @@ export default function CodeActivationPage() {
       setActivationResult(data);
       setSuccess(data.message || "Код успешно активирован!");
       
-    } catch (err) {
+    } catch {
       setLoading(false);
       setError("Ошибка соединения с сервером");
     }
